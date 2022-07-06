@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: assiweb-be
+  namespace: assiweb
+  labels:
+    app: assiweb-be
+    tier: assiweb-api
+    phase: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: assiweb-be
+  template:
+    metadata:
+      labels:
+        app: assiweb-be
+    spec:
+      imagePullSecrets:    
+      - name: assiweb-image-secret
+      containers:
+      - name: assiweb-be
+        image: weacraks01.azurecr.io/assiweb/backend:20220704.1
+        imagePullPolicy: Always
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        ports:
+        - name: be-int-port
+          containerPort: 8080
+        volumeMounts:
+        - name: react-config
+          mountPath: "/app/appsettings.Production.json"
+          subPath: "appsettings.Production.json"
+      volumes:
+        - name: react-config
+          configMap:
+            name: react-config-file-api-assiweb
